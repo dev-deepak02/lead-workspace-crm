@@ -1,0 +1,4 @@
+import {db,now,origin,auditStmt} from '@/lib/crm';
+import {readJSON} from '@/lib/crm';
+export async function POST(req:Request){const d=await readJSON(req,1000);origin(req);const s=await db().prepare('SELECT * FROM sends WHERE token=?').bind(String(d.token||'')).first<any>();if(!s)return Response.json({error:'Invalid unsubscribe link'},{status:400});await db().batch([db().prepare("UPDATE records SET data=json_set(data,'$.unsubscribed',json('true'),'$.consent',json('false')),updated=? WHERE tenant=? AND id=?").bind(now(),s.tenant,s.lead),db().prepare("UPDATE sends SET status='unsubscribed',updated=? WHERE tenant=? AND lead=? AND status IN ('draft','approved','sent','delivered')").bind(now(),s.tenant,s.lead),auditStmt(s.tenant,'recipient','Unsubscribed',s.lead)]);return Response.json({ok:true});}
+
