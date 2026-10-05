@@ -1,0 +1,11 @@
+// Intentionally empty by default.
+// Add Drizzle tables here when the site actually needs a database.
+// See examples/d1/db/schema.ts for an opt-in example.
+import { sqliteTable, text, integer, uniqueIndex, index } from 'drizzle-orm/sqlite-core';
+export const businesses = sqliteTable('businesses', { id:text('id').primaryKey(), slug:text('slug').notNull().unique(), name:text('name').notNull(), config:text('config').notNull(), created:text('created').notNull(), plan:text('plan').notNull().default('starter'), modules:text('modules').notNull().default('[]'), active:integer('active').notNull().default(1) });
+export const members = sqliteTable('members',{id:text('id').primaryKey(),tenant:text('tenant').notNull().references(()=>businesses.id),email:text('email').notNull(),role:text('role').notNull()},t=>[uniqueIndex('member_tenant_email').on(t.tenant,t.email)]);
+export const records = sqliteTable('records',{id:text('id').primaryKey(),tenant:text('tenant').notNull().references(()=>businesses.id),kind:text('kind').notNull(),data:text('data').notNull(),email:text('email'),created:text('created').notNull(),updated:text('updated').notNull()},t=>[index('record_tenant_kind').on(t.tenant,t.kind),uniqueIndex('lead_tenant_email').on(t.tenant,t.kind,t.email)]);
+export const audit = sqliteTable('audit',{id:text('id').primaryKey(),tenant:text('tenant').notNull(),actor:text('actor').notNull(),action:text('action').notNull(),record:text('record'),created:text('created').notNull()},t=>[index('audit_tenant_created').on(t.tenant,t.created)]);
+export const sends = sqliteTable('sends',{id:text('id').primaryKey(),tenant:text('tenant').notNull(),lead:text('lead').notNull(),campaign:text('campaign').notNull(),subject:text('subject').notNull(),body:text('body').notNull(),status:text('status').notNull(),provider:text('provider'),token:text('token').notNull().unique(),created:text('created').notNull(),updated:text('updated').notNull(),approvedBy:text('approved_by'),attachments:text('attachments').notNull().default('[]')},t=>[uniqueIndex('send_tenant_lead_campaign').on(t.tenant,t.lead,t.campaign),index('send_tenant').on(t.tenant)]);
+export const limits = sqliteTable('limits',{key:text('key').primaryKey(),count:integer('count').notNull(),expires:integer('expires').notNull()});
+
