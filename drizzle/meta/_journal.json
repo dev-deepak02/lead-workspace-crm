@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1791196945228,
+      "tag": "0000_uneven_big_bertha",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1791197083297,
+      "tag": "0001_concerned_silver_centurion",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791216023413,
+      "tag": "0002_bent_blue_blade",
+      "breakpoints": true
+    }
+  ]
+}

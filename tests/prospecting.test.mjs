@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {draftFor,businessDate,normalize,verified,validEmail} from '../lib/prospecting.ts';
+const config={business_name:'Example Business',locations:'India',services:['Robotics workshops'],brochure_url:'https://example.com/brochure',website_url:'https://example.com',contact_email:'team@example.com'};
+const lead={organization:'Example School',lead_type:'Schools',email:'school@example.com',verification:'Verified from official website',evidence_url:'https://example.com/contact',personalization_notes:'The school lists a science club.'};
+test('unverified facts and missing evidence cannot be personalized',()=>{assert.throws(()=>draftFor({...lead,verification:'Partially verified'},config));assert.throws(()=>draftFor({...lead,evidence_url:''},config));assert.throws(()=>draftFor({...lead,email:''},config));assert.throws(()=>draftFor({...lead,personalization_notes:''},config));});
+test('school draft uses supplied fact, business and safe unnamed greeting',()=>{const draft=draftFor(lead,config);assert.match(draft.body,/Dear School Leadership Team/);assert.match(draft.subject,/Example School/);assert.match(draft.body,/school lists a science club/);assert.match(draft.body,/https:\/\/example.com\/brochure/);assert.doesNotMatch(draft.body,/DevRobo/);});
+test('NGO message uses partnership framing and configured contact',()=>{const draft=draftFor({...lead,lead_type:'NGOs'},config);assert.match(draft.body,/Dear Partnerships Team/);assert.match(draft.body,/CSR-supported/);assert.match(draft.body,/team@example.com/);});
+test('follow-up dates count business days across weekends',()=>{assert.equal(businessDate('2026-10-09T12:00:00Z',1),'2026-10-12');assert.equal(businessDate('2026-10-09T12:00:00Z',5),'2026-10-16');});
+test('normalization and verification flags do not confer email consent',()=>{assert.equal(normalize('Example School, Ltd.'),'exampleschoolltd');assert.equal(verified('Needs manual review'),false);assert.equal(validEmail('bad\n@example.com'),false);assert.equal(validEmail('hello@example.com'),true);});

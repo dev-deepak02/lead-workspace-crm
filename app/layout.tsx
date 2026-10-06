@@ -20,9 +20,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{__html:"try{document.documentElement.dataset.theme=localStorage.getItem('lead-theme')==='light'?'light':'dark'}catch{}"}}/></head>
       <body className="antialiased">{children}<ThemeToggle/></body>
     </html>
   );
 }
-
